@@ -1,4 +1,4 @@
-Compute Sum, Min and Max of Matrix Elements
+# Compute Sum, Min and Max of Matrix Elements
 
 The purpose of this problem is to introduce you to the Pthreads library. Download, compile and run a program matrixSum.cFörhandsgranska dokumentet. The program computes a sum of matrix elements in parallel using Pthreads. Develop the following three modified versions of the program.
 
