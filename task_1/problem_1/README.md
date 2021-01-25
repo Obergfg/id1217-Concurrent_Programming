@@ -1,6 +1,6 @@
 # Compute Sum, Min and Max of Matrix Elements
 
-The purpose of this problem is to introduce you to the Pthreads library. Download, compile and run a program matrixSum.cFörhandsgranska dokumentet. The program computes a sum of matrix elements in parallel using Pthreads. Develop the following three modified versions of the program.
+The purpose of this problem is to introduce you to the Pthreads library. Download, compile and run a program matrixSum.c The program computes a sum of matrix elements in parallel using Pthreads. Develop the following three modified versions of the program.
 
 (a) Extend the program so that in addition to sum it finds and prints a value and a position (indexes) of the maximum element of the matrix, and a value and a position of the minimum element of the matrix.  Initialize elements of the matrix to random values (rather than to all ones like in the above example) to check your solution.
 

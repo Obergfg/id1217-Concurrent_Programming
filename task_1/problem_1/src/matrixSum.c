@@ -18,8 +18,9 @@
 #include <stdbool.h>
 #include <time.h>
 #include <sys/time.h>
-#define MAXSIZE 10000 /* maximum matrix size */
+#define MAXSIZE 5 /* maximum matrix size */
 #define MAXWORKERS 10 /* maximum number of workers */
+#define DEBUG
 
 pthread_mutex_t barrier; /* mutex lock for the barrier */
 pthread_cond_t go;       /* condition variable for leaving */
@@ -61,7 +62,41 @@ int size, stripSize;          /* assume size is multiple of numWorkers */
 int sums[MAXWORKERS];         /* partial sums */
 int matrix[MAXSIZE][MAXSIZE]; /* matrix */
 
-void *Worker(void *);
+/* Each worker sums the values in one strip of the matrix.
+   After a barrier, worker(0) computes and prints the total */
+void *Worker(void *arg)
+{
+  long myid = (long)arg;
+  int total, i, j, first, last;
+
+#ifdef DEBUG
+  printf("worker %ld (pthread id %ld) has started\n", myid, pthread_self());
+#endif
+
+  /* determine first and last rows of my strip */
+  first = myid * stripSize;
+  last = (myid == numWorkers - 1) ? (size - 1) : (first + stripSize - 1);
+
+  /* sum values in my strip */
+  total = 0;
+  for (i = first; i <= last; i++)
+    for (j = 0; j < size; j++)
+      total += matrix[i][j];
+  sums[myid] = total;
+  Barrier();
+  if (myid == 0)
+  {
+    total = 0;
+    for (i = 0; i < numWorkers; i++)
+      total += sums[i];
+    /* get end time */
+    end_time = read_timer();
+    /* print results */
+    printf("The total is %d\n", total);
+    printf("The execution time is %g sec\n", end_time - start_time);
+  }
+}
+
 
 /* read command line, initialize, and create threads */
 int main(int argc, char *argv[])
@@ -88,12 +123,15 @@ int main(int argc, char *argv[])
     numWorkers = MAXWORKERS;
   stripSize = size / numWorkers;
 
+  // time_t t;
+  // srand((unsigned) time(&t));
+
   /* initialize the matrix */
   for (i = 0; i < size; i++)
   {
     for (j = 0; j < size; j++)
     {
-      matrix[i][j] = 1; //rand()%99;
+      matrix[i][j] = rand()%99;
     }
   }
 
@@ -115,39 +153,4 @@ int main(int argc, char *argv[])
   for (l = 0; l < numWorkers; l++)
     pthread_create(&workerid[l], &attr, Worker, (void *)l);
   pthread_exit(NULL);
-}
-
-/* Each worker sums the values in one strip of the matrix.
-   After a barrier, worker(0) computes and prints the total */
-void *Worker(void *arg)
-{
-  long myid = (long)arg;
-  int total, i, j, first, last;
-
-#ifdef DEBUG
-  printf("worker %d (pthread id %d) has started\n", myid, pthread_self());
-#endif
-
-  /* determine first and last rows of my strip */
-  first = myid * stripSize;
-  last = (myid == numWorkers - 1) ? (size - 1) : (first + stripSize - 1);
-
-  /* sum values in my strip */
-  total = 0;
-  for (i = first; i <= last; i++)
-    for (j = 0; j < size; j++)
-      total += matrix[i][j];
-  sums[myid] = total;
-  Barrier();
-  if (myid == 0)
-  {
-    total = 0;
-    for (i = 0; i < numWorkers; i++)
-      total += sums[i];
-    /* get end time */
-    end_time = read_timer();
-    /* print results */
-    printf("The total is %d\n", total);
-    printf("The execution time is %g sec\n", end_time - start_time);
-  }
 }
