@@ -152,7 +152,6 @@ int main(int argc, char *argv[])
 
   max = malloc(MAXWORKERS*sizeof(element));
   min = malloc(MAXWORKERS*sizeof(element));
-
   /* set global thread attributes */
   pthread_attr_init(&attr);
   pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
@@ -197,4 +196,7 @@ int main(int argc, char *argv[])
     pthread_create(&workerid[l], &attr, Worker, (void *)l);
 
   pthread_exit(NULL);
+
+  free(max);
+  free(min);
 }
