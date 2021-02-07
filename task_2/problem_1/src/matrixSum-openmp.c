@@ -7,11 +7,14 @@
 */
 
 #include <omp.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <sys/time.h>
 
 double start_time, end_time;
 
-#include <stdio.h>
-#define MAXSIZE 10000  /* maximum matrix size */
+#define MAXSIZE 10  /* maximum matrix size */
 #define MAXWORKERS 8   /* maximum number of workers */
 
 int numWorkers;
@@ -33,12 +36,12 @@ int main(int argc, char *argv[]) {
 
   /* initialize the matrix */
   for (i = 0; i < size; i++) {
-    //  printf("[ ");
+      printf("[ ");
 	  for (j = 0; j < size; j++) {
       matrix[i][j] = rand()%99;
-      //	  printf(" %d", matrix[i][j]);
+      	  printf(" %d", matrix[i][j]);
 	  }
-	  //	  printf(" ]\n");
+	  	  printf(" ]\n");
   }
 
   start_time = omp_get_wtime();
