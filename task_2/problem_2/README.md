@@ -1,4 +1,4 @@
-Quicksort
+# Quicksort
 
 The quicksort algorithm sorts the list of numbers by first dividing the list into two sublists, so that all the numbers if one sublist  are smaller than all the numbers in the other sublist. This is done by selecting one number (called a pivot) against which all other number are compared: the numbers which are less than the pivot are placed in one sublist, the numbers which more than the pivot are placed in another sublist. The pivot can be either placed in one sublist or could be withheld and placed in its final position.
 
