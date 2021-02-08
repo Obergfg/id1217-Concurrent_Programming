@@ -14,7 +14,7 @@
 
 double start_time, end_time;
 
-#define MAXSIZE 20 /* maximum matrix size */
+#define MAXSIZE 10000 /* maximum matrix size */
 #define WORKERS 10  /* maximum number of workers */
 
 int numWorkers;

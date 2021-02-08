@@ -8,7 +8,7 @@
 #include <stdbool.h>
 #include <time.h>
 #include <sys/time.h>
-#define MAXSIZE 10000 /* maximum matrix size */
+#define MAXSIZE 100 /* maximum matrix size */
 #define MAXWORKERS 8  /* maximum number of workers */
 #define MAXVALUE 99
 // #define DEBUG
