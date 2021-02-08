@@ -5,7 +5,7 @@
 #include <time.h>
 #include <sys/time.h>
 
-#define LENGTH 10000000
+#define LENGTH 10000
 #define MAXTHREADS 8
 
 typedef struct arguments

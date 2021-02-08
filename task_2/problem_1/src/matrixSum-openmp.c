@@ -14,48 +14,53 @@
 
 double start_time, end_time;
 
-#define MAXSIZE 10  /* maximum matrix size */
-#define MAXWORKERS 8   /* maximum number of workers */
+#define MAXSIZE 20 /* maximum matrix size */
+#define WORKERS 10  /* maximum number of workers */
 
 int numWorkers;
-int size; 
+int size;
 int matrix[MAXSIZE][MAXSIZE];
 void *Worker(void *);
 
 /* read command line, initialize, and create threads */
-int main(int argc, char *argv[]) {
-  int i, j, total=0;
+int main(int argc, char *argv[])
+{
+  int i, j, total = 0;
 
   /* read command line args if any */
-  size = (argc > 1)? atoi(argv[1]) : MAXSIZE;
-  numWorkers = (argc > 2)? atoi(argv[2]) : MAXWORKERS;
-  if (size > MAXSIZE) size = MAXSIZE;
-  if (numWorkers > MAXWORKERS) numWorkers = MAXWORKERS;
+  size = (argc > 1) ? atoi(argv[1]) : MAXSIZE;
+  numWorkers = (argc > 2) ? atoi(argv[2]) : WORKERS;
+  if (size > MAXSIZE)
+    size = MAXSIZE;
+  if (numWorkers > WORKERS)
+    numWorkers = WORKERS;
 
   omp_set_num_threads(numWorkers);
 
   /* initialize the matrix */
-  for (i = 0; i < size; i++) {
-      printf("[ ");
-	  for (j = 0; j < size; j++) {
-      matrix[i][j] = rand()%99;
-      	  printf(" %d", matrix[i][j]);
-	  }
-	  	  printf(" ]\n");
+  for (i = 0; i < size; i++)
+  {
+    //printf("[ ");
+    for (j = 0; j < size; j++)
+    {
+      matrix[i][j] = rand() % 99;
+     // printf(" %d", matrix[i][j]);
+    }
+   // printf(" ]\n");
   }
 
   start_time = omp_get_wtime();
-#pragma omp parallel for reduction (+:total) private(j)
+#pragma omp parallel for reduction(+ \
+                                   : total) private(j)
   for (i = 0; i < size; i++)
-    for (j = 0; j < size; j++){
+    for (j = 0; j < size; j++)
+    {
       total += matrix[i][j];
     }
-// implicit barrier
+  // implicit barrier
 
   end_time = omp_get_wtime();
 
   printf("the total is %d\n", total);
   printf("it took %g seconds\n", end_time - start_time);
-
 }
-
