@@ -3,28 +3,13 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <time.h>
-#include <sys/time.h>
+#include <omp.h>
 
 #define LENGTH 10000000
+#define WORKERS 4
 
 double start_time, end_time;
 
-double read_timer()
-{
-    static bool initialized = false;
-    static struct timeval start;
-    struct timeval end;
-
-    if (!initialized)
-    {
-        gettimeofday(&start, NULL);
-        initialized = true;
-    }
-
-    gettimeofday(&end, NULL);
-
-    return (end.tv_sec - start.tv_sec) + 1.0e-6 * (end.tv_usec - start.tv_usec);
-}
 
 void swap(int *array, int left, int right)
 {
@@ -69,8 +54,11 @@ void quickSort(int *array, int left, int right)
 
     int index = partition(array, left, right, pivot);
 
-    quickSort(array, left, index - 1);
-    quickSort(array, index, right);
+    #pragma omp task firstprivate(array, left, index)
+        quickSort(array, left, index - 1);
+
+    #pragma omp task firstprivate(array, right, index)
+        quickSort(array, index, right);
 }
 
 void print_array(int *array)
@@ -83,18 +71,23 @@ void print_array(int *array)
 
 int main()
 {
-
+    omp_set_num_threads(WORKERS);
     int *array = malloc(LENGTH * sizeof(int));
+    int elements = LENGTH;
 
     for (int i = 0; i < LENGTH; i++)
         array[i] = rand() % 99;
 
 
-    for(int i = 0; i < 5; i++){
-        start_time = read_timer();
-        quickSort(array, 0, LENGTH - 1);
-        end_time = read_timer();
-        // print_array(array);
+    for(int i = 0; i < 5; i++ ){
+        start_time = omp_get_wtime();
+
+        #pragma omp parallel shared (array, elements)
+            #pragma omp single nowait
+                quickSort(array, 0, elements - 1);
+
+        end_time = omp_get_wtime();
+        //   print_array(array);
         printf("%g sec\n", end_time - start_time);
     }
     free(array);
