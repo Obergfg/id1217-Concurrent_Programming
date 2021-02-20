@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
         // printf(" ]\n");
     }
 
-for(int k = 0; k < 5; k++){
+
     start_time = omp_get_wtime();
 
 #pragma omp parallel for reduction(+:total) private(j, localMaxR, localMaxC, localMinR, localMinC) firstprivate(localMax, localMin) //Tried reduction(max:maxV). Couldnt get it to work with position.
@@ -74,10 +74,10 @@ for(int k = 0; k < 5; k++){
 
     end_time = omp_get_wtime();
 
-    // printf("the total is %d\n", total);
-    // printf("the max value is %d at row %d and column %d\n", maxV, maxR + 1, maxC + 1);
-    // printf("the min value is %d at row %d and column %d\n", minV, minR + 1, minC + 1);
+    printf("the total is %d\n", total);
+    printf("the max value is %d at row %d and column %d\n", maxV, maxR + 1, maxC + 1);
+    printf("the min value is %d at row %d and column %d\n", minV, minR + 1, minC + 1);
     printf("it took %g seconds\n", end_time - start_time);
-}
+
 }
 

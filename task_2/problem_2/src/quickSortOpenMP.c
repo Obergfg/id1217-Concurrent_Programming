@@ -5,7 +5,7 @@
 #include <time.h>
 #include <omp.h>
 
-#define LENGTH 10000000
+#define LENGTH 100
 #define WORKERS 4
 
 double start_time, end_time;
@@ -79,7 +79,7 @@ int main()
         array[i] = rand() % 99;
 
 
-    for(int i = 0; i < 5; i++ ){
+
         start_time = omp_get_wtime();
 
         #pragma omp parallel shared (array, elements)
@@ -87,8 +87,8 @@ int main()
                 quickSort(array, 0, elements - 1);
 
         end_time = omp_get_wtime();
-        //   print_array(array);
+           print_array(array);
         printf("%g sec\n", end_time - start_time);
-    }
+    
     free(array);
 }
