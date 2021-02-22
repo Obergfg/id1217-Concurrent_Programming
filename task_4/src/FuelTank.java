@@ -22,5 +22,13 @@ public class FuelTank {
 
     public void setFuelVolume(int fuelVolume) {
         this.fuelVolume = fuelVolume;
+
+        if (0 > this.fuelVolume)
+            this.fuelVolume = 0;
+
+    }
+
+    public void fillFuel() {
+        fuelVolume = capacity;
     }
 }

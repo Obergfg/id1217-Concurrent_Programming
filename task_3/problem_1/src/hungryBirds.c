@@ -34,7 +34,7 @@ void *baby_bird(void *arg){
         worms--;
         printf("Baby bird %ld eats and there are %d worms left!\n", id, worms);
         sem_post(&eat);
-        usleep(100);
+       // usleep(100);
     }
 }
 
