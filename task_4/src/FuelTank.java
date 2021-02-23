@@ -28,7 +28,15 @@ public class FuelTank {
 
     }
 
+    void removeFuel(int amount){
+
+    }
+
     public void fillFuel() {
         fuelVolume = capacity;
+    }
+
+    public void addFuel(int fuel){
+        fuelVolume += fuel;
     }
 }

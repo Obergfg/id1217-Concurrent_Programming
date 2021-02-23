@@ -2,140 +2,154 @@ public class FuelStation {
 
     private final FuelTank nitrogenTank;
     private final FuelTank quantumFluidTank;
-    private final SupplyVehicle nitrogenSupplier;
-    private final SupplyVehicle quantumFluidSupplier;
+    private SupplyVehicle nitrogenSupplier;
+    private SupplyVehicle quantumFluidSupplier;
     private final int dockingCapacity;
     private int freeSlots;
+    private int finishedShips;
+    private final int shipTasks;
+    private boolean needNitrogen;
+    private boolean needQuantumFluid;
 
 
-    FuelStation(int spaceStationDockingCapacity, int nitrogenCapacity, int quantumFluidCapacity) {
+    FuelStation(int spaceStationDockingCapacity, int nitrogenCapacity, int quantumFluidCapacity, int tasks) {
         dockingCapacity = spaceStationDockingCapacity;
         freeSlots = spaceStationDockingCapacity;
         nitrogenTank = new FuelTank(nitrogenCapacity);
         quantumFluidTank = new FuelTank(quantumFluidCapacity);
-        nitrogenSupplier = new SupplyVehicle(nitrogenCapacity / 2, "nitrogen", this);
-        quantumFluidSupplier = new SupplyVehicle(quantumFluidCapacity / 2, "quantum fluid", this);
+        finishedShips = 0;
+        shipTasks = tasks;
+        needNitrogen = false;
+        needQuantumFluid = false;
     }
 
-    void spaceShipDock(SpaceShip spaceShip) {
-
-        sendSpaceStationInfo();
-        while (!hasDockingCapacity()) {
-            spaceShip.isQueueing();
-        }
-
-        spaceShip.hasDocked();
-
-        switch (spaceShip.getRequestState()) {
-            case "nitrogen":
-                if (spaceShipRequestNitrogen(spaceShip))
-                    spaceShip.flying(false);
-                else {
-                    spaceShip.flying(true);
-                    spaceShipDock(spaceShip);
-                }
-                break;
-            case "quantum fluid":
-                if (spaceShipRequestQuantumFluid(spaceShip))
-                    spaceShip.flying(false);
-                else {
-                    spaceShip.flying(true);
-                    spaceShipDock(spaceShip);
-                }
-                break;
-            case "both fuels":
-                if (spaceShipRequestNitrogen(spaceShip)) {
-                    if (spaceShipRequestQuantumFluid(spaceShip))
-                        spaceShip.flying(false);
-                    else {
-                        spaceShip.setQuantumState();
-                        spaceShip.flying(true);
-                        spaceShipDock(spaceShip);
-                    }
-                } else {
-                    spaceShip.flying(true);
-                    spaceShipDock(spaceShip);
-                }
-        }
-
-        increaseDockingCapacity();
-        sendSpaceStationInfo();
-    }
-
-    void supplyVehicleDock(SupplyVehicle supplyVehicle){
-
-        while (!hasDockingCapacity()){
-            supplyVehicle.isQueueing();
-        }
-
-        supplyVehicle.hasDocked();
-
-        switch (supplyVehicle.getFuelType()) {
+    boolean supplyVehicleDock(SupplyVehicle supplyVehicle) {
+        return switch (supplyVehicle.getFuelType()) {
             case "nitrogen" -> supplyNitrogen(supplyVehicle);
             case "quantum fluid" -> supplyQuantumFluid(supplyVehicle);
-        }
-
-        increaseDockingCapacity();
-        sendSpaceStationInfo();
+            default -> false;
+        };
     }
 
-    private synchronized boolean hasDockingCapacity() {
+    synchronized boolean dockRequest() {
 
         if (0 < freeSlots) {
             freeSlots--;
+            sendDockInfo();
             return true;
         } else
             return false;
 
     }
 
-    private synchronized void increaseDockingCapacity() {
+    synchronized void leaveDock() {
         freeSlots++;
+        sendDockInfo();
     }
 
 
-    private synchronized boolean spaceShipRequestNitrogen(SpaceShip spaceShip) {
-
-        int nitrogenRequest = spaceShip.getNitrogen().getCapacity() - spaceShip.getNitrogen().getFuelVolume();
-
+    synchronized boolean requestNitrogen(int nitrogenRequest) {
         if (this.nitrogenTank.getFuelVolume() >= nitrogenRequest) {
             nitrogenTank.setFuelVolume(nitrogenTank.getFuelVolume() - nitrogenRequest);
-            spaceShip.fillNitrogen();
+            sendNitrogenInfo();
             return true;
         } else {
-            nitrogenSupplier.requestFuelSupply();
+            requestSupplyOfNitrogen();
             return false;
         }
     }
 
-    private synchronized boolean spaceShipRequestQuantumFluid(SpaceShip spaceShip) {
-
-        int quantumFluidRequest = spaceShip.getQuantumFluid().getCapacity() - spaceShip.getQuantumFluid().getFuelVolume();
-
+    synchronized boolean requestQuantumFluid(int quantumFluidRequest) {
         if (this.quantumFluidTank.getFuelVolume() >= quantumFluidRequest) {
             quantumFluidTank.setFuelVolume(quantumFluidTank.getFuelVolume() - quantumFluidRequest);
-            spaceShip.fillQuantumFluid();
+            sendQuantumFluidInfo();
             return true;
         } else {
-            quantumFluidSupplier.requestFuelSupply();
+            requestSupplyOfQuantumFluid();
             return false;
         }
     }
 
-    private synchronized void supplyNitrogen(SupplyVehicle supplyVehicle){
+    private synchronized boolean supplyNitrogen(SupplyVehicle supplyVehicle) {
+        int nitrogen = supplyVehicle.getFuelTank().getFuelVolume();
 
+        if (nitrogen <= nitrogenTank.getCapacity() - nitrogenTank.getFuelVolume()) {
+            nitrogenTank.addFuel(nitrogen);
+            requestNitrogen(supplyVehicle.getFuelRequest());
+            supplyVehicle.fueling();
+            sendNitrogenInfo();
+            return true;
+
+        } else {
+            int partVolume = nitrogen - nitrogenTank.getCapacity() - nitrogenTank.getFuelVolume();
+            nitrogenTank.fillFuel();
+            supplyVehicle.getFuelTank().setFuelVolume(partVolume);
+            return false;
+        }
     }
 
-    private synchronized void supplyQuantumFluid(SupplyVehicle supplyVehicle){
+    private synchronized boolean supplyQuantumFluid(SupplyVehicle supplyVehicle) {
+        int quantumFluid = supplyVehicle.getFuelTank().getFuelVolume();
 
-
-
+        if (quantumFluid <= quantumFluidTank.getCapacity() - quantumFluidTank.getFuelVolume()) {
+            quantumFluidTank.addFuel(quantumFluid);
+            sendQuantumFluidInfo();
+            return true;
+        } else {
+            int partVolume = quantumFluid - quantumFluidTank.getCapacity() - quantumFluidTank.getFuelVolume();
+            quantumFluidTank.fillFuel();
+            supplyVehicle.getFuelTank().setFuelVolume(partVolume);
+            return false;
+        }
     }
 
+    private void requestSupplyOfNitrogen() {
+        needNitrogen = true;
+    }
 
-    private void sendSpaceStationInfo() {
-        System.out.println("There are " + (dockingCapacity - freeSlots) + " spaceships docked\n" +
-                "The nitrogen tank has " + nitrogenTank.getFuelVolume() + " units left\n" +
-                "The quantum fluid tank has " + quantumFluidTank.getFuelVolume() + " units left");
+    private void requestSupplyOfQuantumFluid() {
+        needQuantumFluid = true;
+    }
+
+    private void sendNitrogenInfo() {
+        System.out.println("The nitrogen tank has " + nitrogenTank.getFuelVolume() + " units left");
+    }
+
+    private void sendQuantumFluidInfo() {
+        System.out.println("The quantum fluid tank has " + quantumFluidTank.getFuelVolume() + " units left");
+    }
+
+    private void sendDockInfo() {
+        System.out.println("There are " + (dockingCapacity - freeSlots) + " spaceships docked");
+        try {
+            wait(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setNitrogenSupplier(SupplyVehicle nitrogenSupplier) {
+        this.nitrogenSupplier = nitrogenSupplier;
+    }
+
+    public void setQuantumFluidSupplier(SupplyVehicle quantumFluidSupplier) {
+        this.quantumFluidSupplier = quantumFluidSupplier;
+    }
+
+    synchronized void finishedShip() {
+        finishedShips++;
+
+        if (finishedShips >= shipTasks) {
+            System.out.println("All ships are finished with their tasks!");
+            System.exit(0);
+        }
+    }
+
+    boolean inNeedOfFuel(String fuelType) {
+
+        if (fuelType.equals("nitrogen") && needNitrogen)
+            return true;
+
+        return fuelType.equals("quantum fluid") && needQuantumFluid;
     }
 }
