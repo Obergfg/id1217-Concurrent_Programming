@@ -2,8 +2,6 @@ public class FuelStation {
 
     private final FuelTank nitrogenTank;
     private final FuelTank quantumFluidTank;
-    private SupplyVehicle nitrogenSupplier;
-    private SupplyVehicle quantumFluidSupplier;
     private final int dockingCapacity;
     private int freeSlots;
     private int finishedShips;
@@ -50,7 +48,7 @@ public class FuelStation {
 
     synchronized boolean requestNitrogen(int nitrogenRequest) {
         if (this.nitrogenTank.getFuelVolume() >= nitrogenRequest) {
-            nitrogenTank.setFuelVolume(nitrogenTank.getFuelVolume() - nitrogenRequest);
+            nitrogenTank.removeFuel(nitrogenRequest);
             sendNitrogenInfo();
             return true;
         } else {
@@ -61,7 +59,7 @@ public class FuelStation {
 
     synchronized boolean requestQuantumFluid(int quantumFluidRequest) {
         if (this.quantumFluidTank.getFuelVolume() >= quantumFluidRequest) {
-            quantumFluidTank.setFuelVolume(quantumFluidTank.getFuelVolume() - quantumFluidRequest);
+            quantumFluidTank.removeFuel(quantumFluidRequest);
             sendQuantumFluidInfo();
             return true;
         } else {
@@ -75,11 +73,8 @@ public class FuelStation {
 
         if (nitrogen <= nitrogenTank.getCapacity() - nitrogenTank.getFuelVolume()) {
             nitrogenTank.addFuel(nitrogen);
-            requestNitrogen(supplyVehicle.getFuelRequest());
-            supplyVehicle.fueling();
             sendNitrogenInfo();
             return true;
-
         } else {
             int partVolume = nitrogen - nitrogenTank.getCapacity() - nitrogenTank.getFuelVolume();
             nitrogenTank.fillFuel();
@@ -128,14 +123,6 @@ public class FuelStation {
         }
     }
 
-    public void setNitrogenSupplier(SupplyVehicle nitrogenSupplier) {
-        this.nitrogenSupplier = nitrogenSupplier;
-    }
-
-    public void setQuantumFluidSupplier(SupplyVehicle quantumFluidSupplier) {
-        this.quantumFluidSupplier = quantumFluidSupplier;
-    }
-
     synchronized void finishedShip() {
         finishedShips++;
 
@@ -143,6 +130,13 @@ public class FuelStation {
             System.out.println("All ships are finished with their tasks!");
             System.exit(0);
         }
+    }
+
+    void fuelSupplied(String fuelType){
+        if (fuelType.equals("nitrogen"))
+            needNitrogen = false;
+        else
+            needQuantumFluid = false;
     }
 
     boolean inNeedOfFuel(String fuelType) {

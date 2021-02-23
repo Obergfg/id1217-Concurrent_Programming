@@ -27,17 +27,20 @@ public class SpaceShip implements Runnable {
     @Override
     public void run() {
         while (0 < stationsVisitsLeft) {
+
             if (nitrogenTank.getFuelVolume() < nitrogenRefuelLevel && quantumFluidTank.getFuelVolume() < quantumFluidRefuelLevel) {
                 bothRefuelFuelState();
+                stationsVisitsLeft--;
             } else if (nitrogenTank.getFuelVolume() < nitrogenRefuelLevel) {
-                nitrogenRefuelState();
+                refuelState("nitrogen", getNitrogenTank().getFuelVolume(), true);
+                stationsVisitsLeft--;
             } else if (quantumFluidTank.getFuelVolume() < quantumFluidRefuelLevel) {
-                quantumFluidRefuelState();
+                refuelState("quantum fluid", getQuantumFluidTank().getFuelVolume(), true);
+                stationsVisitsLeft--;
             } else
                 decreaseFuel();
 
             flying(false);
-
         }
 
         System.out.println("Space ship " + getShipID() + " has finished its tasks!");
@@ -46,62 +49,41 @@ public class SpaceShip implements Runnable {
 
     private void bothRefuelFuelState() {
 
-        boolean hasRefueled = false;
+        System.out.println("Ship " + getShipID() + " has only " + getNitrogenTank().getFuelVolume() + " " +
+                "units of nitrogen left and " + getQuantumFluidTank().getFuelVolume() + " units of " +
+                "quantum fluid left and is heading for a refuel");
 
-        System.out.println("Ship " + getShipID() + " has only " + getNitrogenTank().getFuelVolume() + " units of nitrogen left and " +
-                getQuantumFluidTank().getFuelVolume() + " units of quantum fluid left and is heading for a refuel");
+        refuelState("nitrogen", getNitrogenTank().getFuelVolume(), false);
+        refuelState("quantum fluid", getQuantumFluidTank().getFuelVolume(), false);
 
-        while (!hasRefueled) {
-
-            if (fuelStation.dockRequest()) {
-                hasDocked("nitrogen");
-                if (fuelStation.requestNitrogen(getNitrogenEmptyVolume())) {
-                    fillNitrogen();
-                    hasRefueled = true;
-                }
-                fuelStation.leaveDock();
-
-                if (!hasRefueled)
-                    flying(true);
-            } else
-                isQueueing();
-        }
-
-        hasRefueled = false;
-
-        while (!hasRefueled) {
-
-            if (fuelStation.dockRequest()) {
-                hasDocked("quantum fluid");
-                if (fuelStation.requestQuantumFluid(getQuantumFluidEmptyVolume())) {
-                    fillQuantumFluid();
-                    hasRefueled = true;
-                }
-                fuelStation.leaveDock();
-
-                if (!hasRefueled)
-                    flying(true);
-            } else
-                isQueueing();
-        }
-
-        stationsVisitsLeft--;
-        System.out.println("Ship " + getShipID() + " has refueled both nitrogen and quantum fluid and is heading out of the fuel station");
+        System.out.println("Ship " + getShipID() + " has refueled both nitrogen and quantum fluid and is heading " +
+                "out of the fuel station");
     }
 
-    private void nitrogenRefuelState() {
+    private void refuelState(String fuelType, int fuelVolume, boolean showMessage) {
         boolean hasRefueled = false;
 
-        System.out.println("Ship " + getShipID() + " has only " + getNitrogenTank().getFuelVolume() + " units of nitrogen left and is heading for a refuel");
+        if (showMessage)
+            System.out.println("Ship " + getShipID() + " has only " + fuelVolume + " units of " + fuelType + " left " +
+                    "and is heading for a refuel");
 
         while (!hasRefueled) {
 
             if (fuelStation.dockRequest()) {
-                hasDocked("nitrogen");
-                if (fuelStation.requestNitrogen(getNitrogenEmptyVolume())) {
-                    fillNitrogen();
-                    hasRefueled = true;
+                hasDocked(fuelType);
+
+                if(fuelType.equals("nitrogen")){
+                    if (fuelStation.requestNitrogen(getNitrogenEmptyVolume())) {
+                        fillNitrogen();
+                        hasRefueled = true;
+                    }
+                }else {
+                    if (fuelStation.requestQuantumFluid(getQuantumFluidEmptyVolume())) {
+                        fillQuantumFluid();
+                        hasRefueled = true;
+                    }
                 }
+
                 fuelStation.leaveDock();
 
                 if (!hasRefueled)
@@ -109,32 +91,9 @@ public class SpaceShip implements Runnable {
             } else
                 isQueueing();
         }
-        stationsVisitsLeft--;
-        System.out.println("Ship " + getShipID() + " has refueled nitrogen and is heading out of the fuel station");
-    }
 
-    private void quantumFluidRefuelState() {
-        boolean hasRefueled = false;
-
-        System.out.println("Ship " + getShipID() + " has only " + getQuantumFluidTank().getFuelVolume() + " units of quantum fluid left and is heading for a refuel");
-
-        while (!hasRefueled) {
-
-            if (fuelStation.dockRequest()) {
-                hasDocked("quantum fluid");
-                if (fuelStation.requestQuantumFluid(getQuantumFluidEmptyVolume())) {
-                    fillQuantumFluid();
-                    hasRefueled = true;
-                }
-                fuelStation.leaveDock();
-
-                if (!hasRefueled)
-                    flying(true);
-            } else
-                isQueueing();
-        }
-        stationsVisitsLeft--;
-        System.out.println("Ship " + getShipID() + " has refueled quantum fuel and is heading out of the fuel station");
+        if (showMessage)
+            System.out.println("Ship " + getShipID() + " has refueled " + fuelType + " and is heading out of the fuel station");
     }
 
 
@@ -158,9 +117,8 @@ public class SpaceShip implements Runnable {
 
     private void decreaseFuel() {
         nitrogenTank.setFuelVolume(nitrogenTank.getFuelVolume() - 1);
-        quantumFluidTank.setFuelVolume(quantumFluidTank.getFuelVolume() - flyingTime.nextInt(4));
+        quantumFluidTank.setFuelVolume(quantumFluidTank.getFuelVolume() - flyingTime.nextInt(3));
     }
-
 
     void flying(boolean atStation) {
 
@@ -186,7 +144,7 @@ public class SpaceShip implements Runnable {
     void isQueueing() {
         System.out.println("Ship " + getShipID() + " is at the station and is queueing for a dock space");
         try {
-            sleep(1000);
+            sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

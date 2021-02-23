@@ -3,8 +3,8 @@ public class Main {
     public static void main(String[] args){
         System.out.println("Program started!");
 
-        int nitrogenCapacity = 100;
-        int quantumFluidCapacity = 100;
+        int nitrogenCapacity = 80;
+        int quantumFluidCapacity = 80;
         int ships = 5;
 
         FuelStation fuelStation = new FuelStation(2, nitrogenCapacity, quantumFluidCapacity, ships);
@@ -13,15 +13,13 @@ public class Main {
 
         Thread n = new Thread(nitrogenSupplyVehicle);
         Thread q = new Thread(quantumFluidSupplyVehicle);
-        fuelStation.setNitrogenSupplier(nitrogenSupplyVehicle);
-        fuelStation.setQuantumFluidSupplier(quantumFluidSupplyVehicle);
         n.start();
         q.start();
 
         SpaceShip[] spaceShips = new SpaceShip[ships];
 
         for(int i = 1; i <= spaceShips.length; i++){
-           Thread t = new Thread(spaceShips[i - 1] = new SpaceShip(i,20, 20, 3, fuelStation));
+           Thread t = new Thread(spaceShips[i - 1] = new SpaceShip(i,20, 20, 4, fuelStation));
            t.start();
         }
     }

@@ -11,7 +11,7 @@ public class SupplyVehicle implements Runnable{
 
     SupplyVehicle(int tankCapacity, String type, FuelStation fs){
         fuelTank = new FuelTank(tankCapacity);
-        fuelRequest = tankCapacity/5;
+        fuelRequest = tankCapacity/10;
         fuelType = type;
         flyingTime = new Random();
         fuelStation = fs;
@@ -19,11 +19,11 @@ public class SupplyVehicle implements Runnable{
 
     @Override
     public void run() {
-
         while (true){
 
                 if(fuelStation.inNeedOfFuel(getFuelType())){
                     delivering();
+                    refuelState();
                     leaving();
                     fuelTank.fillFuel();
                 }
@@ -52,12 +52,10 @@ public class SupplyVehicle implements Runnable{
                     }
                     fuelStation.leaveDock();
                 }else
-                    isQueueing();
+                    isQueueing(hasDelivered);
             }
 
-            if(getFuelType().equals(" quantum fluid"))
-                refuelState();
-
+            fuelStation.fuelSupplied(fuelType);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -66,23 +64,25 @@ public class SupplyVehicle implements Runnable{
     private void refuelState(){
 
         boolean hasRefueled = false;
+        fueling();
 
         while (!hasRefueled) {
 
             if (fuelStation.dockRequest()) {
                 if (fuelStation.requestNitrogen(getFuelRequest())) hasRefueled = true;
                 fuelStation.leaveDock();
-                if (!hasRefueled) isQueueing();
+                if (!hasRefueled) isQueueing(true);
             } else
-                isQueueing();
+                isQueueing(true);
         }
 
     }
 
-    void isQueueing(){
+    void isQueueing(boolean hasDelivered){
         try {
             sleep(1000);
-            System.out.println("A supply vehicle delivering " + fuelType + " is at the station and is queueing for a dock space");
+            if(hasDelivered)System.out.println("A supply vehicle has delivered " + fuelType + " and is queueing for a refuel before leaving the station");
+            else System.out.println("A supply vehicle delivering " + fuelType + " is at the station and is queueing for a dock space");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -100,7 +100,7 @@ public class SupplyVehicle implements Runnable{
     void leaving(){
         try {
             sleep(1000);
-            System.out.println("A supply vehicle has unloaded its cargo of " + fuelType + " and is now leaving the fuel station");
+            System.out.println("A supply vehicle who delivered " + fuelType + " has refueled and is leaving the fuel station");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -108,7 +108,7 @@ public class SupplyVehicle implements Runnable{
 
     void fueling(){
         try {
-            System.out.println("A supply vehicle has unloaded its cargo but but need to wait for refueling before leaving the station.");
+            System.out.println("A supply vehicle has unloaded its cargo but need to refuel before leaving the station.");
             sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();

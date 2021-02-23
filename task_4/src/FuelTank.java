@@ -12,10 +12,6 @@ public class FuelTank {
         return capacity;
     }
 
-    public void setCapacity(int capacity) {
-        this.capacity = capacity;
-    }
-
     public int getFuelVolume() {
         return fuelVolume;
     }
@@ -29,7 +25,7 @@ public class FuelTank {
     }
 
     void removeFuel(int amount){
-
+        fuelVolume -= amount;
     }
 
     public void fillFuel() {
