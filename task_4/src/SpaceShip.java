@@ -10,7 +10,7 @@ public class SpaceShip implements Runnable {
     private final FuelTank nitrogenTank;
     private final FuelTank quantumFluidTank;
     private final FuelStation fuelStation;
-    private final Random flyingTime;
+    private final Random delay;
     private int stationsVisitsLeft;
 
     SpaceShip(int id, int nitrogenCapacity, int quantumFluidCapacity, int dockingTurns, FuelStation fs) {
@@ -21,7 +21,7 @@ public class SpaceShip implements Runnable {
         nitrogenTank = new FuelTank(nitrogenCapacity);
         quantumFluidTank = new FuelTank(quantumFluidCapacity);
         fuelStation = fs;
-        flyingTime = new Random();
+        delay = new Random();
     }
 
     @Override
@@ -53,6 +53,8 @@ public class SpaceShip implements Runnable {
                 "units of nitrogen left and " + getQuantumFluidTank().getFuelVolume() + " units of " +
                 "quantum fluid left and is heading for a refuel");
 
+        flying(false);
+
         refuelState("nitrogen", getNitrogenTank().getFuelVolume(), false);
         refuelState("quantum fluid", getQuantumFluidTank().getFuelVolume(), false);
 
@@ -63,9 +65,10 @@ public class SpaceShip implements Runnable {
     private void refuelState(String fuelType, int fuelVolume, boolean showMessage) {
         boolean hasRefueled = false;
 
-        if (showMessage)
-            System.out.println("Ship " + getShipID() + " has only " + fuelVolume + " units of " + fuelType + " left " +
-                    "and is heading for a refuel");
+        if (showMessage) {
+            System.out.println("Ship " + getShipID() + " has only " + fuelVolume + " units of " + fuelType + " left " + "and is heading for a refuel");
+            flying(false);
+        }
 
         while (!hasRefueled) {
 
@@ -117,7 +120,7 @@ public class SpaceShip implements Runnable {
 
     private void decreaseFuel() {
         nitrogenTank.setFuelVolume(nitrogenTank.getFuelVolume() - 1);
-        quantumFluidTank.setFuelVolume(quantumFluidTank.getFuelVolume() - flyingTime.nextInt(3));
+        quantumFluidTank.setFuelVolume(quantumFluidTank.getFuelVolume() - delay.nextInt(3));
     }
 
     void flying(boolean atStation) {
@@ -126,7 +129,7 @@ public class SpaceShip implements Runnable {
             System.out.println("Ship " + getShipID() + " is at the station and is flying out of the dock since it could not be serviced at the moment");
 
         try {
-            sleep(flyingTime.nextInt(5000));
+            sleep(delay.nextInt(5000));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -144,7 +147,7 @@ public class SpaceShip implements Runnable {
     void isQueueing() {
         System.out.println("Ship " + getShipID() + " is at the station and is queueing for a dock space");
         try {
-            sleep(2000);
+            sleep(delay.nextInt(2000));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

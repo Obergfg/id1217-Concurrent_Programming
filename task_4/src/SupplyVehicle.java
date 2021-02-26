@@ -6,14 +6,14 @@ public class SupplyVehicle implements Runnable{
     private final FuelTank fuelTank;
     private final int fuelRequest;
     private final String fuelType;
-    private final Random flyingTime;
+    private final Random delay;
     private final FuelStation fuelStation;
 
     SupplyVehicle(int tankCapacity, String type, FuelStation fs){
         fuelTank = new FuelTank(tankCapacity);
         fuelRequest = tankCapacity/10;
         fuelType = type;
-        flyingTime = new Random();
+        delay = new Random();
         fuelStation = fs;
     }
 
@@ -41,7 +41,7 @@ public class SupplyVehicle implements Runnable{
         boolean hasDelivered = false;
         try {
             System.out.println("A supply vehicle is on its way to deliver " + fuelType);
-            sleep(flyingTime.nextInt(1000));
+            sleep(delay.nextInt(1000));
 
             while (!hasDelivered){
 
@@ -80,7 +80,7 @@ public class SupplyVehicle implements Runnable{
 
     void isQueueing(boolean hasDelivered){
         try {
-            sleep(1000);
+            sleep(delay.nextInt(2000));
             if(hasDelivered)System.out.println("A supply vehicle has delivered " + fuelType + " and is queueing for a refuel before leaving the station");
             else System.out.println("A supply vehicle delivering " + fuelType + " is at the station and is queueing for a dock space");
         } catch (InterruptedException e) {
