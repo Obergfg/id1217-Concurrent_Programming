@@ -76,6 +76,16 @@ int main(int argc, char *argv[])
 {
     int rank, size;
 
+    printf("Arguments %d\n", argc);
+
+    // for (size_t i = 0; i < sizeof(argv); i++)
+    // {
+    //     printf("%c", argv[i]);
+    // }
+    
+    printf("%s", *argv);
+    printf("\n");
+
     MPI_Init(&argc, &argv);
 
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
