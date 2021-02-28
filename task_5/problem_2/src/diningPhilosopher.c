@@ -1,3 +1,11 @@
+/**
+* To run the program type the following in the command line:
+*
+* mpicc -o philo diningPhilosopher.c
+* mpiexec --hostfile hostfile -np 6 philo
+*
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -20,7 +28,7 @@ void waiter()
         MPI_Recv(&philosopher, 1, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
         left = philosopher - 1;
-        right = (left + 1) % PHILOSOPHERS;
+        right = (philosopher) % PHILOSOPHERS;
 
         if (isDining[left])
         {
@@ -75,16 +83,6 @@ void philosopher(int rank)
 int main(int argc, char *argv[])
 {
     int rank, size;
-
-    printf("Arguments %d\n", argc);
-
-    // for (size_t i = 0; i < sizeof(argv); i++)
-    // {
-    //     printf("%c", argv[i]);
-    // }
-    
-    printf("%s", *argv);
-    printf("\n");
 
     MPI_Init(&argc, &argv);
 
