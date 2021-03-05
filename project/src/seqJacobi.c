@@ -4,13 +4,23 @@
 
 #define GRID 100
 #define ITERATIONS 100
+#define TESTS 5
 
 double **new;
 double **grid;
+double times[TESTS];
 
 double start_time, end_time, maxDiff, temp;
 int gridSize, iterations, boundary;
 FILE *file;
+
+
+int compareFunction(const void *a, const void *b)
+{
+    if (*(double*)a > *(double*)b) return 1;
+    else if (*(double*)a < *(double*)b) return -1;
+    else return 0;
+}
 
 void allocateGrids()
 {
@@ -70,7 +80,9 @@ void solveGrid()
 }
 void output()
 {
-    printf("Grid size: %d\tIterations: %d\tTime: %g\tMaxDiff: %g\n", gridSize, iterations, end_time - start_time, maxDiff);
+    qsort(times, TESTS, sizeof(double), compareFunction);
+
+    printf("Grid size: %d\tIterations: %d\tTime: %g  MaxDiff: %g\n", gridSize, iterations, times[2], maxDiff);
 
     file = fopen("output/seqJacobi.txt", "w");
 
@@ -99,8 +111,9 @@ void initiate()
         findMaxDiff();
         end_time = omp_get_wtime();
 
-        output();
+        times[i] = end_time - start_time;
     }
+        output();
 }
 
 int main(int argc, char *argv[])
