@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <omp.h>
 
-#define GRID 100
-#define ITERATIONS 100
+#define GRID 10
+#define ITERATIONS 10
 #define TESTS 5
 
 double **new;
