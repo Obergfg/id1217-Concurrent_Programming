@@ -86,7 +86,20 @@ void interpolation(int coarse){
             grid[fine][i][j] = (grid[fine][i][j-1] + grid[fine][i][j+1])*0.5;
 }
 
+void restriction(int fine){
+    int i,j,a,b;
+    int coarse = fine-1;
 
+    for (i = 1, a = 1; i <= gridSize[coarse]; i++)
+    {
+        for (j = 1, b = 1; j <= gridSize[coarse]; j++)
+        {
+            grid[coarse][i][j] = grid[fine][a][b]*0.5 + (grid[fine][a-1][b]+grid[fine][a][b-1]+grid[fine][a][b+1]+grid[fine][a+1][b])*0.125;
+            b += 2;
+        }
+        a += 2;
+    }
+}
 
 
 // void findMaxDiff()
@@ -104,7 +117,7 @@ void interpolation(int coarse){
 //         }
 // }
 
-void solveGrid(int level)
+void jacobi(int level)
 {
     int i, j, k;
     for (i = 0; i < iterations; i++)
@@ -146,8 +159,9 @@ void initiate()
 {
     allocateGrids();
     initializeGrids();
-    solveGrid(0);
-    interpolation(0);
+    jacobi(1);
+     //interpolation(0);
+    restriction(1);
     // for (int i = 0; i < 5; i++)
     // {
     //     initializeGrids();

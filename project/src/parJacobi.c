@@ -71,7 +71,7 @@ void findMaxDiff()
         }
 }
 
-void solveGrid()
+void jacobi()
 {
     int i, j, k;
     for (i = 0; i < iterations; i++){
@@ -119,7 +119,7 @@ void initiate()
         initializeGrids();
 
         start_time = omp_get_wtime();
-        solveGrid();
+        jacobi();
         findMaxDiff();
         end_time = omp_get_wtime();
 
