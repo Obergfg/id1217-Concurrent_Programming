@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <omp.h>
 
-#define GRID 5
-#define ITERATIONS 10
+#define GRID 10
+#define ITERATIONS 4
 #define TESTS 5
 #define LEVELS 4
 
@@ -24,11 +24,11 @@ int compareFunction(const void *a, const void *b)
 void allocateGrids()
 {
     for (size_t i = 1; i < LEVELS; i++)
-        gridSize[i] = 2*gridSize[i-1]-1;
-    
+        gridSize[i] = 2 * gridSize[i - 1] - 1;
+
     for (size_t i = 0; i < LEVELS; i++)
-        boundary[i] = gridSize[i]+2;
-    
+        boundary[i] = gridSize[i] + 2;
+
     grid = (double ***)malloc(LEVELS * sizeof(double **));
     new = (double ***)malloc(LEVELS * sizeof(double **));
 
@@ -62,10 +62,11 @@ void initializeGrids()
                 }
 }
 
-void interpolation(int coarse){
+void interpolation(int coarse)
+{
 
-    int i,j,a,b;
-    int fine = coarse+1;
+    int i, j, a, b;
+    int fine = coarse + 1;
 
     for (i = 1, a = i; i <= gridSize[coarse]; i++)
     {
@@ -76,31 +77,31 @@ void interpolation(int coarse){
         }
         a += 2;
     }
-    
-    for(i = 2; i <= gridSize[fine]; i += 2)
-        for(j = 1; j <= gridSize[fine]; j += 2)
-            grid[fine][i][j] = (grid[fine][i-1][j] + grid[fine][i+1][j])*0.5; 
-        
-    for(i = 1; i <= gridSize[fine]; i++)
-        for(j = 2; j <= gridSize[fine]; j += 2)
-            grid[fine][i][j] = (grid[fine][i][j-1] + grid[fine][i][j+1])*0.5;
+
+    for (i = 2; i <= gridSize[fine]; i += 2)
+        for (j = 1; j <= gridSize[fine]; j += 2)
+            grid[fine][i][j] = (grid[fine][i - 1][j] + grid[fine][i + 1][j]) * 0.5;
+
+    for (i = 1; i <= gridSize[fine]; i++)
+        for (j = 2; j <= gridSize[fine]; j += 2)
+            grid[fine][i][j] = (grid[fine][i][j - 1] + grid[fine][i][j + 1]) * 0.5;
 }
 
-void restriction(int fine){
-    int i,j,a,b;
-    int coarse = fine-1;
+void restriction(int fine)
+{
+    int i, j, a, b;
+    int coarse = fine - 1;
 
     for (i = 1, a = 1; i <= gridSize[coarse]; i++)
     {
         for (j = 1, b = 1; j <= gridSize[coarse]; j++)
         {
-            grid[coarse][i][j] = grid[fine][a][b]*0.5 + (grid[fine][a-1][b]+grid[fine][a][b-1]+grid[fine][a][b+1]+grid[fine][a+1][b])*0.125;
+            grid[coarse][i][j] = grid[fine][a][b] * 0.5 + (grid[fine][a - 1][b] + grid[fine][a][b - 1] + grid[fine][a][b + 1] + grid[fine][a + 1][b]) * 0.125;
             b += 2;
         }
         a += 2;
     }
 }
-
 
 // void findMaxDiff()
 // {
@@ -117,7 +118,7 @@ void restriction(int fine){
 //         }
 // }
 
-void jacobi(int level)
+void jacobi(int level, int maxLevel)
 {
     int i, j, k;
     for (i = 0; i < iterations; i++)
@@ -129,6 +130,27 @@ void jacobi(int level)
         for (j = 1; j <= gridSize[level]; j++)
             for (k = 1; k <= gridSize[level]; k++)
                 grid[level][j][k] = (new[level][j - 1][k] + new[level][j + 1][k] + new[level][j][k - 1] + new[level][j][k + 1]) * 0.25;
+    }
+
+    if (maxLevel)
+    {
+        if (level == maxLevel)
+        {
+            restriction(level);
+            jacobi(level - 1, maxLevel - 1);
+        }
+        else
+        {
+            interpolation(level);
+            jacobi(level + 1, maxLevel);
+        }
+    }
+    else if (!level)
+        interpolation(level);
+    else if (3 > level)
+    {
+        interpolation(level);
+        jacobi(level + 1, 0);
     }
 }
 
@@ -149,37 +171,38 @@ void output()
                 if (j == boundary[l] - 1)
                     fprintf(file, "\n");
             }
-        fprintf(file, "\n"); 
+        fprintf(file, "\n");
     }
-        
+
     fclose(file);
 }
 
 void initiate()
 {
     allocateGrids();
-    initializeGrids();
-    jacobi(1);
-     //interpolation(0);
-    restriction(1);
-    // for (int i = 0; i < 5; i++)
-    // {
-    //     initializeGrids();
 
-    //     start_time = omp_get_wtime();
-    //     solveGrid();
-    //     findMaxDiff();
-    //     end_time = omp_get_wtime();
+    for (int i = 0; i < 5; i++)
+    {
+        initializeGrids();
 
-    //     times[i] = end_time - start_time;
-    // }
-         output();
+        start_time = omp_get_wtime();
+        jacobi(0, 1);
+        jacobi(1, 2);
+        jacobi(1, 3);
+        jacobi(1, 0);
+
+        // findMaxDiff();
+        end_time = omp_get_wtime();
+
+        times[i] = end_time - start_time;
+    }
+    output();
 }
 
 int main(int argc, char *argv[])
 {
     gridSize[0] = (argc > 1) ? atoi(argv[1]) : GRID;
-    iterations = (argc > 2) ? atoi(argv[2])*0.5 : ITERATIONS*0.5;
+    iterations = (argc > 2) ? atoi(argv[2]) * 0.5 : ITERATIONS * 0.5;
 
     if (gridSize[0] > GRID)
         gridSize[0] = GRID;
