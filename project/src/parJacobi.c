@@ -24,6 +24,7 @@ int compareFunction(const void *a, const void *b)
 
 void allocateGrids()
 {
+    boundary = gridSize + 1;
     grid = malloc(boundary * sizeof(double *));
     new = malloc(boundary * sizeof(double *));
     for (size_t i = 0; i < boundary; i++)
@@ -111,7 +112,6 @@ void output()
 
 void initiate()
 {
-
     allocateGrids();
 
     for (int i = 0; i < 5; i++)
@@ -131,7 +131,7 @@ void initiate()
 int main(int argc, char *argv[])
 {
     gridSize = (argc > 1) ? atoi(argv[1]) : GRID;
-    iterations = (argc > 2) ? atoi(argv[2]) : ITERATIONS;
+    iterations = (argc > 2) ? atoi(argv[2])*0.5 : ITERATIONS*0.5;
     workers = (argc > 3) ? atoi(argv[3]) : WORKERS;
 
     if (gridSize > GRID)
@@ -142,9 +142,6 @@ int main(int argc, char *argv[])
         workers = WORKERS;
 
     omp_set_num_threads(workers);
-
-    boundary = gridSize + 1;
-    iterations = iterations * 0.5;
 
     initiate();
 

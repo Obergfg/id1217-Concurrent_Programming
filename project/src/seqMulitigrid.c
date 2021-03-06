@@ -2,10 +2,12 @@
 #include <stdio.h>
 #include <omp.h>
 
-#define GRID 10
-#define ITERATIONS 4
+#define GRID 500
+#define ITERATIONS 3000
+#define MINITERATIONS 4
 #define TESTS 5
 #define LEVELS 4
+#define HIGHEST (LEVELS-1)
 
 double start_time, end_time, maxDiff, temp, times[TESTS], ***grid, ***new;
 int iterations, boundary[LEVELS], gridSize[LEVELS];
@@ -96,32 +98,38 @@ void restriction(int fine)
     {
         for (j = 1, b = 1; j <= gridSize[coarse]; j++)
         {
-            grid[coarse][i][j] = grid[fine][a][b] * 0.5 + (grid[fine][a - 1][b] + grid[fine][a][b - 1] + grid[fine][a][b + 1] + grid[fine][a + 1][b]) * 0.125;
+            grid[coarse][i][j] = grid[fine][a][b]*0.5 + (grid[fine][a-1][b] + grid[fine][a][b-1] + grid[fine][a][b + 1] + grid[fine][a + 1][b]) * 0.125;
             b += 2;
         }
         a += 2;
     }
 }
 
-// void findMaxDiff()
-// {
-//     int i, j;
-//     maxDiff = 0;
-//     for (i = 1; i < gridSize; i++)
-//         for (j = 1; j < gridSize; j++)
-//         {
-//             temp = grid[i][j] - new[i][j];
-//             if (temp < 0)
-//                 temp = -temp;
-//             if (temp > maxDiff)
-//                 maxDiff = temp;
-//         }
-// }
+void findMaxDiff()
+{
+    int i, j;
+    maxDiff = 0;
+    for (i = 1; i < gridSize[HIGHEST]; i++)
+        for (j = 1; j < gridSize[HIGHEST]; j++)
+        {
+            temp = grid[HIGHEST][i][j] - new[HIGHEST][i][j];
+            if (temp < 0)
+                temp = -temp;
+            if (temp > maxDiff)
+                maxDiff = temp;
+        }
+}
 
 void jacobi(int level, int maxLevel)
 {
-    int i, j, k;
-    for (i = 0; i < iterations; i++)
+    int i, j, k, iter;
+
+    if(0 == level)
+        iter = iterations;
+    else
+        iter = MINITERATIONS;
+
+    for (i = 0; i < iter; i++)
     {
         for (j = 1; j <= gridSize[level]; j++)
             for (k = 1; k <= gridSize[level]; k++)
@@ -137,7 +145,7 @@ void jacobi(int level, int maxLevel)
         if (level == maxLevel)
         {
             restriction(level);
-            jacobi(level - 1, maxLevel - 1);
+            jacobi(level-1, maxLevel-1);
         }
         else
         {
@@ -147,7 +155,7 @@ void jacobi(int level, int maxLevel)
     }
     else if (!level)
         interpolation(level);
-    else if (3 > level)
+    else if (HIGHEST > level)
     {
         interpolation(level);
         jacobi(level + 1, 0);
@@ -156,23 +164,21 @@ void jacobi(int level, int maxLevel)
 
 void output()
 {
-    // qsort(times, TESTS, sizeof(double), compareFunction);
+    qsort(times, TESTS, sizeof(double), compareFunction);
 
-    // printf("Grid size: %d\tIterations: %d\tTime: %g  MaxDiff: %g\n", gridSize, iterations, times[2], maxDiff);
+    printf("Grid size: %d\tIterations: %d\tTime: %g  MaxDiff: %g\n", gridSize[0], ITERATIONS, times[0], maxDiff);
 
     file = fopen("output/seqMultigrid.txt", "w");
 
-    for (size_t l = 0; l < LEVELS; l++)
-    {
-        for (size_t i = 0; i < boundary[l]; i++)
-            for (size_t j = 0; j < boundary[l]; j++)
+        for (size_t i = 0; i < boundary[HIGHEST]; i++)
+            for (size_t j = 0; j < boundary[3]; j++)
             {
-                fprintf(file, "%.4f ", grid[l][i][j]);
-                if (j == boundary[l] - 1)
+                fprintf(file, "%.4f ", grid[HIGHEST][i][j]);
+                if (j == boundary[HIGHEST] - 1)
                     fprintf(file, "\n");
             }
         fprintf(file, "\n");
-    }
+ 
 
     fclose(file);
 }
@@ -181,7 +187,7 @@ void initiate()
 {
     allocateGrids();
 
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < TESTS; i++)
     {
         initializeGrids();
 
@@ -190,8 +196,7 @@ void initiate()
         jacobi(1, 2);
         jacobi(1, 3);
         jacobi(1, 0);
-
-        // findMaxDiff();
+        findMaxDiff();
         end_time = omp_get_wtime();
 
         times[i] = end_time - start_time;

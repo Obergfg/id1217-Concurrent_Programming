@@ -47,6 +47,7 @@ Your task is to write efficient programs. See the discussion on pages 539-40 of 
 For the parallel programs, divide the grid into horizontal strips of rows of points. This includes all the grids in the multigrid programs. Use one worker process per strip. Each strip should contain about the same number of rows so as to balance the computational load. (The largest strip should contain at most one more row than the smallest strip.) If you use a shared memory programming model, in the parallel programs, implement an efficient dissemination barrier and use it when you need barrier synchronization. Use counter variables and busy waiting, as described at the end of Section 3.4 of the G.Andrews textbook. Make sure your barrier is correct!
 
 For the multigrid programs, use a four-level V cycle as illustrated in Figure 11.8. Use the restriction and interpolation operators described on pages 550-51 of the the G.Andrews textbook. Use Jacobi iteration (option: red/black Gauss-Seidel) for the iterations on each level. Use exactly four iterations on each of the finer grids, and use the command-line argument numIters (see below) for the number of iterations on the coarsest (smallest) grid.
+
 Input Parameters
 
 Your programs should have three command-line arguments in the following order:
