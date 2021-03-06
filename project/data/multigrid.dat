@@ -1,0 +1,30 @@
+seqMultigrid
+Grid size: 500  Iterations: 3000        Time: 26.0948  MaxDiff: 8.97749e-05
+Grid size: 1000 Iterations: 500 Time: 30.2142  MaxDiff: 0.000219606
+
+parMultigrid
+Grid size: 500  Iterations: 3000        Threads: 1      Time: 26.1389  MaxDiff: 8.97749e-05
+Grid size: 500  Iterations: 3000        Threads: 2      Time: 13.5557  MaxDiff: 8.97749e-05
+Grid size: 500  Iterations: 3000        Threads: 3      Time: 10.3467  MaxDiff: 8.97749e-05
+Grid size: 500  Iterations: 3000        Threads: 4      Time: 8.85045  MaxDiff: 8.97749e-05
+
+Grid size: 1000 Iterations: 500 Threads: 1      Time: 30.2529  MaxDiff: 0.000219606
+Grid size: 1000 Iterations: 500 Threads: 2      Time: 17.3854  MaxDiff: 0.000219606
+Grid size: 1000 Iterations: 500 Threads: 3      Time: 13.3832  MaxDiff: 0.000219606
+Grid size: 1000 Iterations: 500 Threads: 4      Time: 11.3942  MaxDiff: 0.000219606
+
+
+seqJacobi
+Grid size: 1000 Iterations: 5000        Time: 26.7954  MaxDiff: 7.20278e-05
+Grid size: 2000 Iterations: 1500        Time: 33.0433  MaxDiff: 0.000240098
+
+parJacobi
+Grid size: 1000 Iterations: 5000        Threads: 1      Time: 26.843  MaxDiff: 7.20278e-05
+Grid size: 1000 Iterations: 5000        Threads: 2      Time: 14.7183  MaxDiff: 7.20278e-05
+Grid size: 1000 Iterations: 5000        Threads: 3      Time: 13.376  MaxDiff: 7.20278e-05
+Grid size: 1000 Iterations: 5000        Threads: 4      Time: 11.5058  MaxDiff: 7.20278e-05
+
+Grid size: 2000 Iterations: 1500        Threads: 1      Time: 33.3004  MaxDiff: 0.000240098
+Grid size: 2000 Iterations: 1500        Threads: 2      Time: 21.9653  MaxDiff: 0.000240098
+Grid size: 2000 Iterations: 1500        Threads: 3      Time: 15.1829  MaxDiff: 0.000240098
+Grid size: 2000 Iterations: 1500        Threads: 4      Time: 14.6042  MaxDiff: 0.000240098

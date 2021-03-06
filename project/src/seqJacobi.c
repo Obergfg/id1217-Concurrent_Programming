@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <omp.h>
 
-#define GRID 10
-#define ITERATIONS 10
+#define GRID 2000
+#define ITERATIONS 1500
 #define TESTS 5
 
 double **new;
@@ -24,6 +24,8 @@ int compareFunction(const void *a, const void *b)
 
 void allocateGrids()
 {
+    boundary = gridSize + 1;
+
     grid = malloc(boundary * sizeof(double *));
     new = malloc(boundary * sizeof(double *));
     for (size_t i = 0; i < boundary; i++)
@@ -82,7 +84,7 @@ void output()
 {
     qsort(times, TESTS, sizeof(double), compareFunction);
 
-    printf("Grid size: %d\tIterations: %d\tTime: %g  MaxDiff: %g\n", gridSize, iterations, times[2], maxDiff);
+    printf("Grid size: %d\tIterations: %d\tTime: %g  MaxDiff: %g\n", gridSize, iterations*2, times[TESTS/2], maxDiff);
 
     file = fopen("output/seqJacobi.txt", "w");
 
@@ -102,7 +104,7 @@ void initiate()
 
     allocateGrids();
 
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < TESTS; i++)
     {
         initializeGrids();
 
@@ -119,15 +121,12 @@ void initiate()
 int main(int argc, char *argv[])
 {
     gridSize = (argc > 1) ? atoi(argv[1]) : GRID;
-    iterations = (argc > 2) ? atoi(argv[2]) : ITERATIONS;
+    iterations = (argc > 2) ? atoi(argv[2])*0.5 : ITERATIONS*0.5;
 
     if (gridSize > GRID)
         gridSize = GRID;
     if (iterations > ITERATIONS)
         iterations = ITERATIONS;
- 
-    boundary = gridSize + 1;
-    iterations = iterations * 0.5;
 
     initiate();
 

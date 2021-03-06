@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <omp.h>
 
-#define GRID 100
-#define ITERATIONS 100
+#define GRID 2000
+#define ITERATIONS 1500
 #define WORKERS 4
 #define TESTS 5
 
@@ -75,10 +75,7 @@ void findMaxDiff()
 void jacobi()
 {
     int i, j, k;
-    for (i = 0; i < iterations; i++){
-
-        #pragma omp parallel
-        {   
+    for (i = 0; i < iterations; i++){ 
             #pragma omp for private(k)
             for (j = 1; j < gridSize; j++)
                 for (k = 1; k < gridSize; k++)
@@ -88,14 +85,14 @@ void jacobi()
             for (j = 1; j < gridSize; j++)
                 for (k = 1; k < gridSize; k++)
                     grid[j][k] = (new[j - 1][k] + new[j + 1][k] + new[j][k - 1] + new[j][k + 1]) * 0.25;
-        }
+        
     }
 }
 void output()
 {
     qsort(times, TESTS, sizeof(double), compareFunction);
 
-    printf("Grid size: %d\tIterations: %d\tTime: %g  MaxDiff: %g\n", gridSize, iterations, times[2], maxDiff);
+    printf("Grid size: %d\tIterations: %d\tThreads: %d\tTime: %g  MaxDiff: %g\n", gridSize, iterations*2, workers ,times[TESTS/2], maxDiff);
 
     file = fopen("output/parJacobi.txt", "w");
 
@@ -114,13 +111,16 @@ void initiate()
 {
     allocateGrids();
 
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < TESTS; i++)
     {
         initializeGrids();
 
         start_time = omp_get_wtime();
-        jacobi();
-        findMaxDiff();
+        #pragma omp parallel
+        {
+            jacobi();
+            findMaxDiff();
+        }
         end_time = omp_get_wtime();
 
         times[i] = end_time - start_time;

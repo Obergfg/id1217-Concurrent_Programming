@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <omp.h>
 
-#define GRID 10
-#define ITERATIONS 10
+#define GRID 1000
+#define ITERATIONS 500
 #define MINITERATIONS 4
 #define TESTS 5
 #define LEVELS 4
@@ -68,34 +68,40 @@ void initializeGrids()
 void interpolation(int coarse)
 {
 
-    int i, j, a, b;
+    int i, j, a = 1, b;
     int fine = coarse + 1;
-
-    for (i = 1, a = i; i <= gridSize[coarse]; i++)
-    {
-        for (j = 1, b = 1; j <= gridSize[coarse]; j++)
+    
+    /* Quite positive that this makes the performance worse. Could not get it to work without the parallel inclusion. */
+    //#pragma omp parallel for private(j)
+        for (i = 1; i <= gridSize[coarse]; i++)
         {
-            grid[fine][a][b] = grid[coarse][i][j];
-            b += 2;
+            for (j = 1, b = 1; j <= gridSize[coarse]; j++)
+            {
+                grid[fine][a][b] = grid[coarse][i][j];
+                b += 2;
+            }
+            a += 2;
         }
-        a += 2;
-    }
+    
 
+    #pragma omp for private(j)
     for (i = 2; i <= gridSize[fine]; i += 2)
         for (j = 1; j <= gridSize[fine]; j += 2)
-            grid[fine][i][j] = (grid[fine][i - 1][j] + grid[fine][i + 1][j]) * 0.5;
+            grid[fine][i][j] = (grid[fine][i - 1][j] + grid[fine][i + 1][j])*0.5;
 
+    #pragma omp for private(j)
     for (i = 1; i <= gridSize[fine]; i++)
         for (j = 2; j <= gridSize[fine]; j += 2)
-            grid[fine][i][j] = (grid[fine][i][j - 1] + grid[fine][i][j + 1]) * 0.5;
+            grid[fine][i][j] = (grid[fine][i][j - 1] + grid[fine][i][j + 1])*0.5;
 }
 
 void restriction(int fine)
 {
-    int i, j, a, b;
+    int i, j, a = 1, b;
     int coarse = fine - 1;
 
-    for (i = 1, a = 1; i <= gridSize[coarse]; i++)
+    #pragma omp parallel for private(j)
+    for (i = 1; i <= gridSize[coarse]; i++)
     {
         for (j = 1, b = 1; j <= gridSize[coarse]; j++)
         {
@@ -110,14 +116,20 @@ void findMaxDiff()
 {
     int i, j;
     maxDiff = 0;
+
+    #pragma omp for private(j,temp)
     for (i = 1; i < gridSize[HIGHEST]; i++)
         for (j = 1; j < gridSize[HIGHEST]; j++)
         {
             temp = grid[HIGHEST][i][j] - new[HIGHEST][i][j];
             if (temp < 0)
                 temp = -temp;
+
             if (temp > maxDiff)
-                maxDiff = temp;
+                #pragma omp critical
+                    if(temp > maxDiff)
+                        maxDiff = temp;
+                
         }
 }
 
@@ -130,17 +142,20 @@ void jacobi(int level, int maxLevel)
     else
         iter = MINITERATIONS;
 
-    for (i = 0; i < iter; i++)
-    {
-        for (j = 1; j <= gridSize[level]; j++)
-            for (k = 1; k <= gridSize[level]; k++)
-                new[level][j][k] = (grid[level][j - 1][k] + grid[level][j + 1][k] + grid[level][j][k - 1] + grid[level][j][k + 1]) * 0.25;
+ 
+        for (i = 0; i < iter; i++)
+        {
+            #pragma omp for private(k)
+            for (j = 1; j <= gridSize[level]; j++)
+                for (k = 1; k <= gridSize[level]; k++)
+                    new[level][j][k] = (grid[level][j - 1][k] + grid[level][j + 1][k] + grid[level][j][k - 1] + grid[level][j][k + 1]) * 0.25;
 
-        for (j = 1; j <= gridSize[level]; j++)
-            for (k = 1; k <= gridSize[level]; k++)
-                grid[level][j][k] = (new[level][j - 1][k] + new[level][j + 1][k] + new[level][j][k - 1] + new[level][j][k + 1]) * 0.25;
-    }
-
+            #pragma omp for private(k)
+            for (j = 1; j <= gridSize[level]; j++)
+                for (k = 1; k <= gridSize[level]; k++)
+                    grid[level][j][k] = (new[level][j - 1][k] + new[level][j + 1][k] + new[level][j][k - 1] + new[level][j][k + 1]) * 0.25;
+        }
+    
     if (maxLevel)
     {
         if (level == maxLevel)
@@ -167,9 +182,9 @@ void output()
 {
     qsort(times, TESTS, sizeof(double), compareFunction);
 
-    printf("Grid size: %d\tIterations: %d\tTime: %g  MaxDiff: %g\n", gridSize[0], ITERATIONS, times[0], maxDiff);
+    printf("Grid size: %d\tIterations: %d\tThreads: %d\tTime: %g  MaxDiff: %g\n", gridSize[0], iterations*2, workers,times[2], maxDiff);
 
-    file = fopen("output/seqMultigrid.txt", "w");
+    file = fopen("output/parMultigrid.txt", "w");
 
         for (size_t i = 0; i < boundary[HIGHEST]; i++)
             for (size_t j = 0; j < boundary[3]; j++)
@@ -193,11 +208,14 @@ void initiate()
         initializeGrids();
 
         start_time = omp_get_wtime();
-        jacobi(0, 1);
-        jacobi(1, 2);
-        jacobi(1, 3);
-        jacobi(1, 0);
-        findMaxDiff();
+        #pragma omp parallel
+        {
+            jacobi(0, 1);
+            jacobi(1, 2);
+            jacobi(1, 3);
+            jacobi(1, 0);
+            findMaxDiff();
+        }
         end_time = omp_get_wtime();
 
         times[i] = end_time - start_time;
@@ -214,7 +232,7 @@ int main(int argc, char *argv[])
     if (gridSize[0] > GRID)
         gridSize[0] = GRID;
     if (iterations > ITERATIONS)
-        iterations = ITERATIONS;
+        iterations = ITERATIONS*0.5;
     if (workers > WORKERS)
         workers = WORKERS;
 

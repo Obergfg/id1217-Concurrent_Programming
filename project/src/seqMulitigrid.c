@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <omp.h>
 
-#define GRID 500
-#define ITERATIONS 3000
+#define GRID 1000
+#define ITERATIONS 500
 #define MINITERATIONS 4
 #define TESTS 5
 #define LEVELS 4
@@ -166,7 +166,7 @@ void output()
 {
     qsort(times, TESTS, sizeof(double), compareFunction);
 
-    printf("Grid size: %d\tIterations: %d\tTime: %g  MaxDiff: %g\n", gridSize[0], ITERATIONS, times[0], maxDiff);
+    printf("Grid size: %d\tIterations: %d\tTime: %g  MaxDiff: %g\n", gridSize[0], ITERATIONS, times[2], maxDiff);
 
     file = fopen("output/seqMultigrid.txt", "w");
 
