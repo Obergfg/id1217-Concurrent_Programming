@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <omp.h>
 
-#define GRID 2000
-#define ITERATIONS 1500
+#define GRID 10
+#define ITERATIONS 100
 #define TESTS 5
 
 double **new;
@@ -24,7 +24,7 @@ int compareFunction(const void *a, const void *b)
 
 void allocateGrids()
 {
-    boundary = gridSize + 1;
+    boundary = gridSize + 2;
 
     grid = malloc(boundary * sizeof(double *));
     new = malloc(boundary * sizeof(double *));
@@ -55,8 +55,8 @@ void findMaxDiff()
 {
     int i, j;
     maxDiff = 0;
-    for (i = 1; i < gridSize; i++)
-        for (j = 1; j < gridSize; j++)
+    for (i = 1; i <= gridSize; i++)
+        for (j = 1; j <= gridSize; j++)
         {
             temp = grid[i][j] - new[i][j];
             if (temp < 0)
@@ -71,12 +71,12 @@ void jacobi()
     int i, j, k;
     for (i = 0; i < iterations; i++)
     {
-        for (j = 1; j < gridSize; j++)
-            for (k = 1; k < gridSize; k++)
+        for (j = 1; j <= gridSize; j++)
+            for (k = 1; k <= gridSize; k++)
                 new[j][k] = (grid[j - 1][k] + grid[j + 1][k] + grid[j][k - 1] + grid[j][k + 1]) * 0.25;
 
-        for (j = 1; j < gridSize; j++)
-            for (k = 1; k < gridSize; k++)
+        for (j = 1; j <= gridSize; j++)
+            for (k = 1; k <= gridSize; k++)
                 grid[j][k] = (new[j - 1][k] + new[j + 1][k] + new[j][k - 1] + new[j][k + 1]) * 0.25;
     }
 }
