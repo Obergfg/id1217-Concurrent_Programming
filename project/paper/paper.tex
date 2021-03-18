@@ -49,7 +49,8 @@ Laplace’s equation is an elliptic second order PDE were given a spatial region
 \end{wrapfigure}
 \newpage
 
-\section{Programs}\label{programs}
+
+\section{Design and Implementation}\label{programs}
 
 In Jacobi iteration is the new value of each grid-point set to the average of the old values of the four points left, right, above, and below it. These calculations are performed in a loop which repeats until the computation terminates. This is implemented by creating an N*N square-grid surrounded by a square of boundary points where the boundary values are initialized to one and the interior grid points to zero(see Figure 1). Instead of terminating when reaching an acceptable value of epsilon is the Jacobi iterations of the implementations terminated after an M number of iterations. The epsilon value is then calculated after the iterations are terminated with the intent of not letting the program execute for an unpredictable amount of time. Two grids were created and used in the implementation since the new values calculated needed to be stored in a temporary grid to not overwrite old values still needed for future calculations. How this is implemented can bee seen in the following pseudo code:
 
@@ -90,6 +91,13 @@ Restriction is the operation when going from a finer grid level to a coarser one
  \newpage
  
 Both sequential PDE solver versions - the basic Jacobi as well as the multigrid – were after the correctness of them had been tested parallelized with the intention of getting faster execution times and thereby better performance. This was done by using the Open MP library which is an application programming interface(API) supporting multi-platform shared memory multiprocessor programming in C which is the programming language used in the implementations. It basically is an implementation of multithreading where a primary thread forks a specified number of sub threads which identified tasks are divided among. The threads then run concurrently with the runtime environment allocating threads to different processors. To accomplish this parallelization were parts of the programs which where parallelizable identified – the tasks divided among the threads - and this were parts where a lot of independent calculations were done iteratively – basically the calculations in the grid done in the loops of the programs. The Open MP functionality were implemented at these parts to signal to the compiler that these were to be parallelized and the results of these changes are shown in the performance evaluation section.
+
+\section{Software and Computing Platform}
+
+This chapter decribes the hardware as well as software used during the development of the implementations of the PDE solvers this paper is based on. The purpose of this is for the reader to get a grasp on if the result in the chapter following this is reasonable.
+
+The implementaions were developed on a Intel(R) Core(TM) i5-8250U CPU @ 1.60GHz computer with eight Gb of RAM. The operating system used was Ubuntu 20.04.2 LTS and the developement environment used was Visual Studio Code.
+
 
 \section{Performance Evaluation}\label{performanceevaluation}
 
