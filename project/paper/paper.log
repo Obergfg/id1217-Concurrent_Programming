@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 2.9.7440 64-bit) (preloaded format=pdflatex 2020.5.19)  8 MAR 2021 20:24
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 2.9.7440 64-bit) (preloaded format=pdflatex 2020.5.19)  18 MAR 2021 15:15
 entering extended mode
 **./paper.tex
 (paper.tex
@@ -1111,7 +1111,7 @@ Package caption Info: End \AtBeginDocument code.
 \openout7 = `paper.toc'.
 
  [2]
-<../images/grid.png, id=54, 298.2342pt x 292.2117pt>
+<../images/grid.png, id=52, 298.2342pt x 292.2117pt>
 File: ../images/grid.png Graphic file (type png)
 <use ../images/grid.png>
 Package pdftex.def Info: ../images/grid.png  used on input line 46.
@@ -1121,13 +1121,13 @@ Package pdftex.def Info: ../images/grid.png  used on input line 46.
 Package wrapfig Warning: Stationary wrapfigure forced to float on input line 52
 .
 
-<../images/lvloperations.png, id=59, 379.4175pt x 180.675pt>
+<../images/lvloperations.png, id=57, 379.4175pt x 180.675pt>
 File: ../images/lvloperations.png Graphic file (type png)
 <use ../images/lvloperations.png>
 Package pdftex.def Info: ../images/lvloperations.png  used on input line 75.
 (pdftex.def)             Requested size: 137.9979pt x 65.71286pt.
 [4 <../images/grid.png>]
-<../images/multigridpattern.png, id=66, 742.2129pt x 251.4996pt>
+<../images/multigridpattern.png, id=64, 742.2129pt x 251.4996pt>
 File: ../images/multigridpattern.png Graphic file (type png)
 <use ../images/multigridpattern.png>
 Package pdftex.def Info: ../images/multigridpattern.png  used on input line 86.
@@ -1144,11 +1144,11 @@ PGFPlots: reading {../data/jacobismall.dat}
 PGFPlots: reading {../data/jacobismall.dat}
 PGFPlots: reading {../data/jacobismall.dat}
  [8] [9]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 238.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 238.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 240.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 240.
  (paper.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 238.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 238.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 240.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 240.
 Package rerunfilecheck Info: File `paper.out' has not changed.
 (rerunfilecheck)             Checksum: DB4EA8979F9B1D7F0F9EEBAF86F203AF;282.
 
@@ -1160,27 +1160,25 @@ Package logreq Info: Writing requests to 'paper.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 36012 strings out of 480799
- 865224 string characters out of 2895784
+ 36008 strings out of 480799
+ 865188 string characters out of 2895784
  1686641 words of memory out of 3000000
- 51461 multiletter control sequences out of 15000+200000
- 534623 words of font info for 32 fonts, out of 3000000 for 9000
+ 51459 multiletter control sequences out of 15000+200000
+ 534016 words of font info for 30 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 76i,20n,127p,1996b,2349s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 76i,20n,127p,1277b,2349s stack positions out of 5000i,500n,10000p,200000b,50000s
 <C:/Users/fredr/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts
 /cm/cmbx10.pfb><C:/Users/fredr/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/pu
 blic/amsfonts/cm/cmbx12.pfb><C:/Users/fredr/AppData/Local/Programs/MiKTeX 2.9/f
-onts/type1/public/amsfonts/cm/cmbx9.pfb><C:/Users/fredr/AppData/Local/Programs/
-MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/fredr/AppData/Loc
-al/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/fredr
-/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:
-/Users/fredr/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/c
-mr5.pfb><C:/Users/fredr/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/am
-sfonts/cm/cmr9.pfb><C:/Users/fredr/AppData/Local/Programs/MiKTeX 2.9/fonts/type
-1/public/amsfonts/cm/cmtt10.pfb>
-Output written on paper.pdf (9 pages, 209101 bytes).
+onts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/fredr/AppData/Local/Programs/
+MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/fredr/AppData/Loc
+al/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Users/fredr
+/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr5.pfb><C:/
+Users/fredr/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cm
+tt10.pfb>
+Output written on paper.pdf (9 pages, 190783 bytes).
 PDF statistics:
- 130 PDF objects out of 1000 (max. 8388607)
+ 122 PDF objects out of 1000 (max. 8388607)
  23 named destinations out of 1000 (max. 500000)
  76 words of extra memory for PDF output out of 10000 (max. 10000000)
 
